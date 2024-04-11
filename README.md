@@ -68,5 +68,5 @@ python -m panel serve ./openai_assistant/single_qubit/single_qubit_panel_assista
 
 In `src`:
 ```bash
- ./openai_assistant/single_qubit/single_qubit_terminal_assistant.py
+ python ./openai_assistant/single_qubit/single_qubit_terminal_assistant.py
  ```
