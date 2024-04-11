@@ -1,0 +1,8 @@
+sty
+colorcet
+numpy
+matplotlib
+qiskit
+qiskit-aer
+
+git+https://github.com/learnqc/code.git
