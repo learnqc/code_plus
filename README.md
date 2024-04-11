@@ -53,7 +53,7 @@ Create an OpenAI Assistant equipped with the single qubit circuit tools: in `src
 ```bash
  python ./openai_assistant/single_qubit/assistant_setup.py
  ```
-Copy the assistent id from the terminal:
+Copy the assistant id from the terminal log:
 
 ```bash
 Assistant(id='...', created_at
