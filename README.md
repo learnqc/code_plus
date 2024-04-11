@@ -61,7 +61,7 @@ https://github.com/logicalguess/book_assistant/assets/579979/9deafb2b-8e8f-48b8-
 
 In `src`:
 ```bash
- ./openai_assistant/single_qubit/single_qubit_panel_assistant.py
+python -m panel serve ./openai_assistant/single_qubit/single_qubit_panel_assistant.py --show
  ```
 
 ### Run Terminal Assistant
