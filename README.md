@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 ```bash
 cd src 
- python -m panel serve experiments/single_qubit.py --show
+python -m panel serve experiments/single_qubit.py --show
 ```
 
 ![Single Qubit App](./assets/images/single_qubit_app.png)
