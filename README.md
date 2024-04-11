@@ -44,7 +44,7 @@ SINGLE_QUBIT_ASSISTANT_ID=
 ```
 
 ### Create OpenAI Assistant
-Populate the `OPENAI_API_KEY` variable in the `.env` file:
+Use your OpenAI API Key (see [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)) to populate the `OPENAI_API_KEY` variable in the `.env` file:
 
 ```bash
 OPENAI_API_KEY=...
