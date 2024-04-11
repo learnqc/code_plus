@@ -34,22 +34,31 @@ python -m panel serve experiments/single_qubit.py --show
 
 ## AI Assistant
 
+### .env file
+
+Create a `.env` file in `src` with `OPENAI_API_KEY` and `SINGLE_QUBIT_ASSISTANT_ID` as variables:
+
+```bash
+OPENAI_API_KEY=
+SINGLE_QUBIT_ASSISTANT_ID=
+```
+
 ### Create OpenAI Assistant
-Populate the `OPENAI_API_KEY` variable in the .env file:
+Populate the `OPENAI_API_KEY` variable in the `.env` file:
 
 ```bash
 OPENAI_API_KEY=...
 ```
 Create an OpenAI Assistant equipped with the single qubit circuit tools: in `src`:
 ```bash
- ./openai_assistant/single_qubit/assistant_setup.py
+ python ./openai_assistant/single_qubit/assistant_setup.py
  ```
 Copy the assistent id from the terminal:
 
 ```bash
 Assistant(id='...', created_at
 ```
-(or from your [OpenAI list of assistants](https://platform.openai.com/assistants)) and use it to populate the `SINGLE_QUBIT_ASSISTANT_ID` variable in the .env file:
+(or from your [OpenAI list of assistants](https://platform.openai.com/assistants)) and use it to populate the `SINGLE_QUBIT_ASSISTANT_ID` variable in the `.env` file:
 
 ```bash
 SINGLE_QUBIT_ASSISTANT_ID=...
