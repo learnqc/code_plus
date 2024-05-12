@@ -1,22 +1,22 @@
 from math import pi
 
-from hume.qiskit.util import hume_to_qiskit
 from hume.simulator.circuit import QuantumCircuit, QuantumRegister
 
-from components.common import arg_gates, add_gate, Display, state_table_to_string
+from components.common import Display, arg_gates, add_gate, state_table_to_string
 
 
-class SingleQubit():
+class AnyQubit():
 
-    def __init__(self, display=Display.BROWSER):
+    def __init__(self, qubits, display=Display.BROWSER):
         self.display = display
-        self.qc = QuantumCircuit(QuantumRegister(1))
+        self.qubits = qubits
+        self.qc = QuantumCircuit(QuantumRegister(qubits))
 
-    def apply_gate(self, gate, angle=None, report=True):
+    def apply_gate(self, target, gate, angle=None, report=True):
         gate = gate.lower()
         if gate in arg_gates:
             assert(angle is not None)
-        add_gate(self.qc, [], 0, gate, angle / 180 * pi if gate in arg_gates else None)
+        add_gate(self.qc, [], target, gate, angle / 180 * pi if gate in arg_gates else None)
         if report:
             self.qc.report(f'Step {len(self.qc.reports) + 1}')
 
@@ -35,19 +35,11 @@ class SingleQubit():
     # def report(self):
     #     return self.qc.report(f'Step {len(self.qc.reports)}')[2]
 
-    def get_circuit(self):
-        qc_qiskit = hume_to_qiskit(self.qc.regs, self.qc.transformations)
-        qc_str = str(qc_qiskit.draw())
-        print(qc_str)
-        return qc_str
-
     def reset(self):
-        self.qc = QuantumCircuit(QuantumRegister(1))
+        self.qc = QuantumCircuit(QuantumRegister(self.qubits))
 
     def last_step(self):
         return len(self.qc.reports)
 
     def run(self):
         return self.qc.run()
-
-

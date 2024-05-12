@@ -1,4 +1,5 @@
-from components.single_qubit_component import SingleQubit, Display
+from components.single_qubit_component import SingleQubit
+from components.common import Display
 from openai_assistant.core.tool_executor import ToolExecutorInterface
 
 class SingleQubitToolExecutor(ToolExecutorInterface):

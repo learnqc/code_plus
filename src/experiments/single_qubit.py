@@ -6,7 +6,8 @@ import sys
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.resolve()))
 
-from components.single_qubit_component import state_table_to_string, SingleQubit, arg_gates, gates
+from components.single_qubit_component import SingleQubit
+from components.common import arg_gates, gates, state_table_to_string
 
 import panel as pn
 

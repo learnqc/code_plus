@@ -5,7 +5,7 @@ import sys
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent.resolve()))
 
-from components.single_qubit_component import Display
+from components.common import Display
 from openai_assistant.config import cfg
 
 import asyncio
