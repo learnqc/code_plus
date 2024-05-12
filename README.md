@@ -34,25 +34,34 @@ python -m panel serve experiments/single_qubit.py --show
 
 ## AI Assistant
 
-### Create OpenAI Assistant
-Populate the `OPENAI_API_KEY` variable in the config/env file:
+### .env file
+
+Create a `.env` file in `src` with `OPENAI_API_KEY` and `SINGLE_QUBIT_ASSISTANT_ID` as variables:
 
 ```bash
-'OPENAI_API_KEY': '...'
+OPENAI_API_KEY=
+SINGLE_QUBIT_ASSISTANT_ID=
+```
+
+### Create OpenAI Assistant
+Use your OpenAI API Key (see [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)) to populate the `OPENAI_API_KEY` variable in the `.env` file:
+
+```bash
+OPENAI_API_KEY=...
 ```
 Create an OpenAI Assistant equipped with the single qubit circuit tools: in `src`:
 ```bash
- ./openai_assistant/single_qubit/assistant_setup.py
+ python ./openai_assistant/single_qubit/assistant_setup.py
  ```
-Copy the assistent id from the terminal:
+Copy the assistant id from the terminal log:
 
 ```bash
 Assistant(id='...', created_at
 ```
-(or from your [OpenAI list of assistants](https://platform.openai.com/assistants)) and use it to populate the `SINGLE_QUBIT_ASSISTANT_ID` variable in the config/env file:
+(or from your [OpenAI list of assistants](https://platform.openai.com/assistants)) and use it to populate the `SINGLE_QUBIT_ASSISTANT_ID` variable in the `.env` file:
 
 ```bash
-'SINGLE_QUBIT_ASSISTANT_ID': '...'
+SINGLE_QUBIT_ASSISTANT_ID=...
 ```
 
 ### Run Browser Assistant
@@ -61,12 +70,12 @@ https://github.com/logicalguess/book_assistant/assets/579979/9deafb2b-8e8f-48b8-
 
 In `src`:
 ```bash
- ./openai_assistant/single_qubit/single_qubit_panel_assistant.py
+python -m panel serve ./openai_assistant/single_qubit/single_qubit_panel_assistant.py --show
  ```
 
 ### Run Terminal Assistant
 
 In `src`:
 ```bash
- ./openai_assistant/single_qubit/single_qubit_terminal_assistant.py
+ python ./openai_assistant/single_qubit/single_qubit_terminal_assistant.py
  ```
