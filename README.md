@@ -32,6 +32,15 @@ python -m panel serve experiments/single_qubit.py --show
 
 ![Single Qubit App](./assets/images/single_qubit_app.png)
 
+## Run the any-qubit UI application
+
+```bash
+cd src 
+python -m panel serve experiments/any_qubit.py --show
+```
+
+![Any Qubit App](./assets/images/any_qubit_app.png)
+
 ## AI Assistant
 
 ### .env file
