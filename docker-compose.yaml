@@ -9,6 +9,6 @@ services:
     ports:
       - 7860:7860
     command: >
-      bash -c "panel serve  /home/assistant/openai_assistant/single_qubit/single_qubit_panel_assistant.py /home/assistant/experiments/single_qubit.py --address 0.0.0.0 --port 7860  --allow-websocket-origin '*'"
+      bash -c "panel serve  /home/assistant/openai_assistant/single_qubit/single_qubit_panel_assistant.py /home/assistant/experiments/single_qubit.py /home/assistant/experiments/any_qubit.py --address 0.0.0.0 --port 7860  --allow-websocket-origin '*'"
     working_dir: /home/assistant
     container_name: programming_quantum_software_assistant
