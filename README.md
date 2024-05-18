@@ -1,3 +1,14 @@
+# Building Quantum Software: A Developer's Guide
+
+
+
+[<img src="/assets/images/Gonciulea-MEAP-HI.png">](https://www.manning.com/books/building-quantum-software)
+
+
+[Building Quantum Software: A Developer's Guide](https://mng.bz/Ad87) will teach you the foundations of quantum computing, how to implement quantum computations, and when to take advantage of the benefits of quantum computing.
+
+This repository contains additional resources for the book .
+
 ### Setting up the code
 #### Clone repository
 Start by cloning the repository:
