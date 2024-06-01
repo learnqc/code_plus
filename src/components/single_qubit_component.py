@@ -16,7 +16,7 @@ class SingleQubit():
         gate = gate.lower()
         if gate in arg_gates:
             assert(angle is not None)
-        add_gate(self.qc, [], 0, gate, angle / 180 * pi if gate in arg_gates else None)
+        add_gate(self.qc, [], 0, gate, angle if gate in arg_gates else None)
         if report:
             self.qc.report(f'Step {len(self.qc.reports) + 1}')
 
@@ -30,7 +30,7 @@ class SingleQubit():
         if self.display == Display.TERMINAL:
             return ''
         else:
-            return f'{state_table_to_string(state)}'
+            return (''.join(['{0} -> {1}\n'.format(k, v) for k,v in enumerate(map(str, state))]), f'{state_table_to_string(state)}')
 
     # def report(self):
     #     return self.qc.report(f'Step {len(self.qc.reports)}')[2]
@@ -39,7 +39,7 @@ class SingleQubit():
         qc_qiskit = hume_to_qiskit(self.qc.regs, self.qc.transformations)
         qc_str = str(qc_qiskit.draw())
         print(qc_str)
-        return qc_str
+        return ('The circuit is shown by the system.', qc_str)
 
     def reset(self):
         self.qc = QuantumCircuit(QuantumRegister(1))

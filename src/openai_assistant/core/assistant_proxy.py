@@ -7,6 +7,7 @@ from openai.types.beta import Thread
 from openai.types.beta.threads import Run
 import json
 
+
 class OpenaiAssistantProxy():
     def __init__(self, asst_id, tool_executor:ToolExecutorInterface):
         self.asst_id = asst_id
@@ -61,7 +62,7 @@ class OpenaiAssistantProxy():
             output = self.tool_executor.execute_tool(function_name, arguments)
             result = {
                 "call_id": call_id,
-                "output": json.dumps(output)
+                "output": json.dumps(output[0] if isinstance(output, tuple) else output)
             }
             results.append(result)
             if(output):

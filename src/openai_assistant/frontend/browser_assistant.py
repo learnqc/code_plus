@@ -14,6 +14,7 @@ logging.basicConfig()
 logger = logging.getLogger("my-logger")
 logger.setLevel(logging.ERROR)
 
+
 class BrowserPanelAssistant():
 
     def __init__(self, asst_proxy:OpenaiAssistantProxy, title="Assistant"):
@@ -25,6 +26,14 @@ class BrowserPanelAssistant():
 
         def callback(self, contents: str, user: str, instance: pn.chat.ChatInterface):
             response, tool_outputs = self.asst_proxy.send_user_message(contents)
+
+            for output in tool_outputs:
+                if isinstance(output, tuple):
+                    chat_interface.send(
+                        output[1].strip('\"').replace('```', ''),
+                        user="System",
+                        respond=False,
+                    )
             clean_response = response.strip('\"').replace('```', '')
             return clean_response
 
