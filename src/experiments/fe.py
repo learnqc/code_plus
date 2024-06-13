@@ -37,16 +37,20 @@ def run(n, v):
     global out
     qc = encode_frequency(n, v)
 
+    #frequency
+    f = (f'Frequency:\n{v}' + (f' mapped to {round(v%2**n, 2)}' if v >= 2**n or v < 0 else ''))
+
     #circuit
-    c = get_circuit(qc)
+    c = f'Circuit:\n{get_circuit(qc)}'
 
     #state
-    qc.report('s')
-    state = qc.reports['s'][2]
-    s = state_table_to_string(state)
+    state = qc.reports['iqft'][2]
+    s = f'State:\n{state_table_to_string(state)}'
+
+
 
     #combining string
-    out = f"Circuit:\n{c}\n\\nState:\n{s}"
+    out = f"{f}\n\n{c}\n\n{s}"
 
 
     return pn.pane.Str(out)
@@ -54,7 +58,7 @@ def run(n, v):
 run(3, 4.3)
 
 qubits = pn.widgets.IntInput(name="Qubits", value=3, start=1, end=5)
-frequency = pn.widgets.FloatInput(name="Frequency", value=4.3, start=0, end=10)
+frequency = pn.widgets.FloatInput(name="Frequency", value=4.3, start=0)
 
 display = pn.bind(
     run, n=qubits, v=frequency
