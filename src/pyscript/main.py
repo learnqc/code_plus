@@ -1,26 +1,46 @@
-#!/usr/bin/env python -m panel serve
-
-import pathlib
-import sys
 from enum import Enum
+from math import pi, log2, log10, floor, atan2
 
-
-from hume.simulator.circuit import QuantumCircuit, QuantumRegister
-from hume.qiskit.util import hume_to_qiskit
+from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from hume.utils.common import complex_to_rgb
-from math import log2, floor, log10, atan2, pi
-# from components.common import Display, get_circuit, state_table_to_string
+
 import panel as pn
 
+pn.extension(sizing_mode="stretch_width")
+
+
+def circuit_to_string(qc, n):
+    qs = [{'id': i} for i in range(sum(qc.regs))]
+    ops = []
+
+    # Determine the number of swaps at the end based on the number of qubits (n)
+    if n == 1:
+        num_swaps = 0
+    elif n in [2, 3]:
+        num_swaps = 1
+    elif n in [4, 5]:
+        num_swaps = 2
+    elif n == 6:
+        num_swaps = 3
+    else:
+        raise ValueError("Unsupported number of qubits: {}".format(n))
+
+    # Loop through all but the last num_swaps transformations
+    for tr in qc.transformations[:-num_swaps]:
+        ops.append({
+            'gate': tr.name.upper() if tr.arg is None else f'{tr.name.upper()}({round(tr.arg, 2)})',
+            'isControlled': len(tr.controls) > 0,
+            'controls': [{'qId': c} for c in tr.controls],
+            'targets': [{'qId': tr.target}]
+        })
+
+    circ = {'qubits': qs, 'operations': ops}
+    return str(circ).replace('True', 'true').replace('False', 'false')
 
 class Display(Enum):
     BROWSER = 1
     TERMINAL = 2
-def get_circuit(qc):
-    qc_qiskit = hume_to_qiskit(qc.regs, qc.transformations)
-    qc_str = str(qc_qiskit.draw())
-    print(qc_str)
-    return qc_str
+
 def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u2588'):
     assert (decimals <= 10)
     n = int(log2(len(state)))
@@ -78,10 +98,6 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
 
     return output
 
-# template = pn.template.BootstrapTemplate(title='Building Quantum Software')
-
-# template.header.append('### Frequency Encoding')
-
 def encode_frequency(n, v):
     q = QuantumRegister(n)
     qc = QuantumCircuit(q)
@@ -99,44 +115,3 @@ def encode_frequency(n, v):
     qc.report('iqft')
 
     return qc
-
-def run(n, v):
-    global out
-    qc = encode_frequency(n, v)
-
-    #frequency
-    f = (f'Frequency:\n{v}' + (f' mapped to {round(v%2**n, 2)}' if v >= 2**n or v < 0 else ''))
-
-    #circuit
-    c = f'Circuit:\n{get_circuit(qc)}'
-
-    #state
-    state = qc.reports['iqft'][2]
-    s = f'State:\n{state_table_to_string(state)}'
-
-
-
-    #combining string
-    out = f"{f}\n\n{c}\n\n{s}"
-
-
-    return pn.pane.Str(out)
-
-run(3, 4.3)
-
-qubits = pn.widgets.IntInput(name="Qubits", value=3, start=1, end=5)
-frequency = pn.widgets.FloatInput(name="Frequency", value=4.3, start=0)
-
-display = pn.bind(
-    run, n=qubits, v=frequency
-)
-
-widgets = pn.Column(qubits, frequency, sizing_mode='fixed', width=300)
-
-pn.Column(widgets, display)
-
-pn.template.MaterialTemplate(
-    title="Frequency Encoding",
-    sidebar=[qubits, frequency],
-    main=[display],
-).servable();
