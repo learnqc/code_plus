@@ -9,30 +9,40 @@ import panel as pn
 pn.extension(sizing_mode="stretch_width")
 
 
-def circuit_to_string(qc, n):
-    qs = [{'id': i} for i in range(sum(qc.regs))]
-    ops = []
+# def circuit_to_string(qc, n):
+#     qs = [{'id': i} for i in range(sum(qc.regs))]
+#     ops = []
 
-    # Determine the number of swaps at the end based on the number of qubits (n)
-    if n == 1:
-        num_swaps = 0
-    elif n in [2, 3]:
-        num_swaps = 1
-    elif n in [4, 5]:
-        num_swaps = 2
-    elif n == 6:
-        num_swaps = 3
-    else:
-        raise ValueError("Unsupported number of qubits: {}".format(n))
+#     # Determine the number of swaps at the end based on the number of qubits (n)
+#     if n == 1:
+#         num_swaps = 0
+#     elif n in [2, 3]:
+#         num_swaps = 1
+#     elif n in [4, 5]:
+#         num_swaps = 2
+#     elif n == 6:
+#         num_swaps = 3
+#     else:
+#         raise ValueError("Unsupported number of qubits: {}".format(n))
 
-    # Loop through all but the last num_swaps transformations
-    for tr in qc.transformations[:-num_swaps]:
-        ops.append({
-            'gate': tr.name.upper() if tr.arg is None else f'{tr.name.upper()}({round(tr.arg, 2)})',
+#     # Loop through all but the last num_swaps transformations
+#     for tr in qc.transformations[:-num_swaps]:
+#         ops.append({
+#             'gate': tr.name.upper() if tr.arg is None else f'{tr.name.upper()}({round(tr.arg, 2)})',
+#             'isControlled': len(tr.controls) > 0,
+#             'controls': [{'qId': c} for c in tr.controls],
+#             'targets': [{'qId': tr.target}]
+#         })
+
+#     circ = {'qubits': qs, 'operations': ops}
+#     return str(circ).replace('True', 'true').replace('False', 'false')
+
+def circuit_to_string(qc):
+    qs = [{ 'id': i } for i in range(sum(qc.regs))]
+    ops = [{'gate': tr.name.upper() if tr.arg is None else f'{tr.name.upper()}({round(tr.arg, 2)})',
             'isControlled': len(tr.controls) > 0,
-            'controls': [{'qId': c} for c in tr.controls],
-            'targets': [{'qId': tr.target}]
-        })
+            'controls': [{ 'qId': c } for c in tr.controls],
+            'targets': [{ 'qId': tr.target }]} for tr in qc.transformations]
 
     circ = {'qubits': qs, 'operations': ops}
     return str(circ).replace('True', 'true').replace('False', 'false')
@@ -104,13 +114,11 @@ def encode_frequency(n, v):
 
     for j in range(n):
         qc.h(q[j])
+        qc.p(pi * 2 ** -j * v, q[j])
 
-    for j in range(n):
-        qc.p(2 * pi / 2 ** (n - j) * v, q[j]) # <1>
+    qc.report('signal')
 
-    qc.report('geometric_sequence')
-
-    qc.append_iqft(q)
+    qc.append_iqft(q, reversed=True, swap=False) #Apply the IQFT to qubit in reverse order and skip the qubit swapping in the IQFT
 
     qc.report('iqft')
 

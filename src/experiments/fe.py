@@ -21,6 +21,7 @@ def get_circuit(qc):
     qc_str = str(qc_qiskit.draw())
     print(qc_str)
     return qc_str
+
 def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u2588'):
     assert (decimals <= 10)
     n = int(log2(len(state)))
@@ -88,13 +89,11 @@ def encode_frequency(n, v):
 
     for j in range(n):
         qc.h(q[j])
+        qc.p(pi * 2 ** -j * v, q[j])
 
-    for j in range(n):
-        qc.p(2 * pi / 2 ** (n - j) * v, q[j]) # <1>
+    qc.report('signal')
 
-    qc.report('geometric_sequence')
-
-    qc.append_iqft(q)
+    qc.append_iqft(q, reversed=True, swap=False) #Apply the IQFT to qubit in reverse order and skip the qubit swapping in the IQFT
 
     qc.report('iqft')
 
@@ -130,13 +129,13 @@ state = pn.bind(
     get_state_str, n=qubits, v=frequency
 )
 
-freq = pn.bind(
+mapped = pn.bind(
     get_frequency, n=qubits, v=frequency
 )
 widgets = pn.Column(qubits, frequency, sizing_mode='fixed', width=100)
 
 display = pn.GridBox(
-    freq,
+    mapped,
     circuit,
     state,
     ncols=1,

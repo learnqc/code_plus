@@ -135,7 +135,7 @@
             js.clearInfo()
 
             qc = encode_frequency(qubits.value, frequency.value)
-            c = circuit_to_string(qc, qubits.value)
+            c = circuit_to_string(qc)
 
             state = qc.reports['iqft'][2]
             s = f'State:{state_table_to_string(state)}'
@@ -144,7 +144,7 @@
             n = qubits.value
             v = frequency.value
             f = (f'Frequency:\n{v}' + (f' mapped to {round(v%2**n, 2)}' if v >= 2**n or v < 0 else ''))
-
+            
             out = pn.pane.Str(f'{s}\n\n{f}').servable(target='info')
             return out
         
