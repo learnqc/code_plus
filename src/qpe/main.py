@@ -6,6 +6,10 @@ from hume.utils.common import complex_to_rgb
 
 import panel as pn
 import sympy as sp
+from sty import bg
+
+from tabulate import tabulate
+
 
 pn.extension(sizing_mode="stretch_width")
 
@@ -78,6 +82,7 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
                              ])
         output += '\n'
 
+
     return output
 
 def encode_term(coeff, vars, circuit, key, value):
@@ -113,45 +118,46 @@ def build_polynomial_circuit(key_size, value_size, terms):
     circuit.report('qpe')
     return circuit
 
+def grid_state(state, m=1, neg=False, show_probs=False):
+    n = int(log2(len(state))) - m
+    cols = 2**m
+    rows = int(len(state) / cols) # first register
+    print('\n')
+    if neg:
+        out = tabulate([[(str(k) if k < rows/2 else str(k - rows)) + ' = ' + bin(k)[2:].zfill(n)] + [
+            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
+            for l in range(cols)] for k in list(range(int(rows/2)))[::-1] + list(range(int(rows/2), rows))[::-1]],
+                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
+                       tablefmt='fancy_grid')
+    else:
+        out = tabulate([[str(k) + ' = ' + bin(k)[2:].zfill(n)] + [
+            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
+            for l in range(cols)] for k in range(rows)[::-1]],
+                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
+                       tablefmt='fancy_grid')
+
+    return out
 # polynomial stuff
-def get_boolean_poly(poly_str, num_bits):
-    def to_binary(num, num_bits):
-        return [int(i) for i in format(num, '0' + str(num_bits) + 'b')]
+def terms_from_poly(poly_str, num_bits, is_poly):
+    for i in range(num_bits):
+        globals()[f'x{i}'] = sp.Symbol(f'x{i}')
 
-    def generate_binary_values(num_bits):
-        return [to_binary(i, num_bits) for i in range(2**num_bits)]
+    if is_poly:
+        temp = [f'{2 ** i}*x{i}' for i in range(num_bits)]
+        bin_var_str = '+'.join(temp[::-1])
+        bin_var = sp.sympify(bin_var_str)
 
-    def boolean_polynomial(func, num_bits):
-        terms = {}
+        new_poly = poly_str.replace('x', f"({str(bin_var)})")
+    else:
+        new_poly = poly_str
+    s = sp.poly(new_poly)
 
-        binary_values = generate_binary_values(num_bits)
+    terms = s.terms()
 
-        for binary_x in binary_values:
-            x = int(''.join(map(str, binary_x)), 2)
-            fx = func(x)
-            
-            for bit_values in binary_values:
-                term_val = 1
-                for bit, value in zip(binary_x, bit_values):
-                    if bit != value:
-                        term_val = 0
-                        break
-                if term_val:
-                    term_key = tuple(i for i, bit in enumerate(bit_values) if bit)
-                    if term_key in terms:
-                        terms[term_key] += fx
-                    else:
-                        terms[term_key] = fx
+    poly = []
+    for term in terms:
+        temp = (int(term[1]), [int(i) for i in range(len(term[0])) if term[0][i] > 0])
+        poly.append(temp)
 
-        return [(coef, list(term)) for term, coef in terms.items() if coef != 0]
+    return poly
 
-    def polynomial_func_factory(my_poly):
-        x = sp.Symbol('x')
-        def polynomial_func(x_val):
-            return int(my_poly.eval(x_val))
-        return polynomial_func
-    x = sp.Symbol('x')
-    my_poly = sp.polys.polytools.poly_from_expr(poly_str)[0]
-    polynomial_func = polynomial_func_factory(my_poly)
-    boolean_poly = boolean_polynomial(polynomial_func, num_bits)
-    return boolean_poly

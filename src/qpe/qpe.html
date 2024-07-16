@@ -80,7 +80,9 @@
                     <div class="bk-root" id="num-key-widget"></div>
                     <div class="bk-root" id="num-value-widget"></div>
                     <div class="bk-root" id="poly-widget"></div>
+                    <div class="bk-root" id="select-widget"></div>
                     <div class="bk-root" id="go-widget"></div>
+
                 </ul>
             </div>
             <div class="col mh-100 float-right" id="main">
@@ -118,31 +120,31 @@
 
     <py-script>
         import js
+        from tabulate import tabulate
+        from sty import bg
 
-        n_key = pn.widgets.IntInput(name="# of Qubits", value=4).servable(target='num-key-widget')
-        n_value = pn.widgets.IntInput(name="# of Bits", value=4).servable(target='num-value-widget')
-        poly = pn.widgets.TextInput(name="Polynomial", value='3*x**2 - 4*x + 5').servable(target='poly-widget')
+        select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms']).servable(target='select-widget')
+        n_key = pn.widgets.IntInput(name="# of Qubits", value=2).servable(target='num-key-widget')
+        n_value = pn.widgets.IntInput(name="# of Bits", value=2).servable(target='num-value-widget')
+        poly = pn.widgets.TextInput(name="Polynomial", value='x**2').servable(target='poly-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
 
         @pn.depends(go, watch=True)
         def run(v):
             
             js.clearInfo()
-            
-            coeffs = get_boolean_poly(poly.value, n_value.value)
+            coeffs = terms_from_poly(poly.value, n_key.value, select.value == 'Polynomial')
             qc = build_polynomial_circuit(n_key.value, n_value.value, coeffs)
 
             c = circuit_to_string(qc)
 
             state = qc.reports['qpe'][2]
-            s = f'State:{state_table_to_string(state)}'
+            s = f'State:\n{grid_state(state, n_key.value, False, True)}'
+            # s = f'State:\n{state_table_to_string(state)}'
             js.draw(c)
             
             out = pn.pane.Str(f'{s}\n').servable(target='info')
-            return out
-        
-
-        
+            return out        
     </py-script>
 </body>
 </html>
