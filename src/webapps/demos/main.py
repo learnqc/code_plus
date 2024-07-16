@@ -5,37 +5,16 @@ from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from hume.utils.common import complex_to_rgb
 
 import panel as pn
+import sympy as sp
+from sty import bg, fg
+
+from tabulate import tabulate
 
 pn.extension(sizing_mode="stretch_width")
 
-
-# def circuit_to_string(qc, n):
-#     qs = [{'id': i} for i in range(sum(qc.regs))]
-#     ops = []
-
-#     # Determine the number of swaps at the end based on the number of qubits (n)
-#     if n == 1:
-#         num_swaps = 0
-#     elif n in [2, 3]:
-#         num_swaps = 1
-#     elif n in [4, 5]:
-#         num_swaps = 2
-#     elif n == 6:
-#         num_swaps = 3
-#     else:
-#         raise ValueError("Unsupported number of qubits: {}".format(n))
-
-#     # Loop through all but the last num_swaps transformations
-#     for tr in qc.transformations[:-num_swaps]:
-#         ops.append({
-#             'gate': tr.name.upper() if tr.arg is None else f'{tr.name.upper()}({round(tr.arg, 2)})',
-#             'isControlled': len(tr.controls) > 0,
-#             'controls': [{'qId': c} for c in tr.controls],
-#             'targets': [{'qId': tr.target}]
-#         })
-
-#     circ = {'qubits': qs, 'operations': ops}
-#     return str(circ).replace('True', 'true').replace('False', 'false')
+class Display(Enum):
+    BROWSER = 1
+    TERMINAL = 2
 
 def circuit_to_string(qc):
     qs = [{ 'id': i } for i in range(sum(qc.regs))]
@@ -46,10 +25,6 @@ def circuit_to_string(qc):
 
     circ = {'qubits': qs, 'operations': ops}
     return str(circ).replace('True', 'true').replace('False', 'false')
-
-class Display(Enum):
-    BROWSER = 1
-    TERMINAL = 2
 
 def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u2588'):
     assert (decimals <= 10)
@@ -106,8 +81,87 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
                              ])
         output += '\n'
 
+
     return output
 
+def grid_state(state, m=1, neg=False, show_probs=False):
+    n = int(log2(len(state))) - m
+    cols = 2**m
+    rows = int(len(state) / cols) # first register
+    print('\n')
+    if neg:
+        out = tabulate([[(str(k) if k < rows/2 else str(k - rows)) + ' = ' + bin(k)[2:].zfill(n)] + [
+            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
+            for l in range(cols)] for k in list(range(int(rows/2)))[::-1] + list(range(int(rows/2), rows))[::-1]],
+                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
+                       tablefmt='fancy_grid')
+    else:
+        out = tabulate([[str(k) + ' = ' + bin(k)[2:].zfill(n)] + [
+            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
+            for l in range(cols)] for k in range(rows)[::-1]],
+                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
+                       tablefmt='fancy_grid')
+
+    return out
+
+# ----------------------- QPE FUNCTIONS ----------------------- #
+def encode_term(coeff, vars, circuit, key, value):
+    if isinstance(coeff, int) is False:
+        coeff = coeff.value
+    for i in range(len(value)):
+        if len(vars) > 1:
+            # circuit.mcp(2*pi * 2 ** (i - N) * coeff, [key[j] for j in vars], value[i])
+            circuit.mcp(pi * 2 ** -i * coeff, [key[j] for j in vars], value[i])
+        elif len(vars) > 0:
+            # circuit.cp(2*pi * 2 ** (i - N) * coeff, key[vars[0]], value[i])
+            circuit.cp(pi * 2 ** -i * coeff, key[vars[0]], value[i])
+        else:
+            # circuit.p(2*pi * 2 ** (i - N) * coeff, value[i])
+            circuit.p(pi * 2 ** -i * coeff, value[i])
+
+def build_polynomial_circuit(key_size, value_size, terms):
+    key = QuantumRegister(key_size)
+    value = QuantumRegister(value_size)
+    circuit = QuantumCircuit(key, value)
+
+    for i in range(len(key)):
+        circuit.h(key[i])
+
+    for i in range(len(value)):
+        circuit.h(value[i])
+
+    for (coeff, vars) in terms:
+        encode_term(coeff, vars, circuit, key, value)
+
+    circuit.iqft(value[::-1], swap=False)
+
+    circuit.report('qpe')
+    return circuit
+
+def terms_from_poly(poly_str, num_bits, is_poly):
+    for i in range(num_bits):
+        globals()[f'x{i}'] = sp.Symbol(f'x{i}')
+
+    if is_poly:
+        temp = [f'{2 ** i}*x{i}' for i in range(num_bits)]
+        bin_var_str = '+'.join(temp[::-1])
+        bin_var = sp.sympify(bin_var_str)
+
+        new_poly = poly_str.replace('x', f"({str(bin_var)})")
+    else:
+        new_poly = poly_str
+    s = sp.poly(new_poly)
+
+    terms = s.terms()
+
+    poly = []
+    for term in terms:
+        temp = (int(term[1]), [int(i) for i in range(len(term[0])) if term[0][i] > 0])
+        poly.append(temp)
+
+    return poly
+
+# ----------------------- FE FUNCTIONS ----------------------- #
 def encode_frequency(n, v):
     q = QuantumRegister(n)
     qc = QuantumCircuit(q)
