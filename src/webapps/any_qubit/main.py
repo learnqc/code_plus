@@ -1,26 +1,58 @@
-#!/usr/bin/env python -m panel serve
-
-import pathlib
-import sys
 from enum import Enum
+from math import pi, log2, log10, floor, atan2
 
-
-from hume.simulator.circuit import QuantumCircuit, QuantumRegister
-from hume.qiskit.util import hume_to_qiskit
+from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from hume.utils.common import complex_to_rgb
-from math import log2, floor, log10, atan2, pi
-# from components.common import Display, get_circuit, state_table_to_string
+
 import panel as pn
+
+pn.extension(sizing_mode="stretch_width")
+
+
+def circuit_to_string(qc):
+    qs = [{ 'id': i } for i in range(sum(qc.regs))]
+    ops = [{'gate': tr.name.upper() if tr.arg is None else f'{tr.name.upper()}({round(tr.arg, 2)})',
+            'isControlled': len(tr.controls) > 0,
+            'controls': [{ 'qId': c } for c in tr.controls],
+            'targets': [{ 'qId': tr.target }]} for tr in qc.transformations]
+
+    circ = {'qubits': qs, 'operations': ops}
+    return str(circ).replace('True', 'true').replace('False', 'false')
+
+no_arg_gates = ['h', 'x', 'y', 'z']
+arg_gates = ['p', 'rx', 'ry', 'rz']
+gates = no_arg_gates + arg_gates
+
+
+def add_gate(qc, cs, target, gate, angle):
+    if len(cs) == 1:
+        gate = 'c' + gate
+    elif len(cs) > 1:
+        gate = 'mc' + gate
+
+    m = getattr(qc, gate)
+
+    if angle is None:
+        if len(cs) == 1:
+            m(cs[0], int(target))
+        elif len(cs) > 1:
+            m(cs, int(target))
+        else:
+            m(int(target))
+    else:
+        if len(cs) == 1:
+            m(angle, cs[0], int(target))
+        elif len(cs) > 1:
+            m(angle, cs, int(target))
+        else:
+            m(angle, int(target))
 
 
 class Display(Enum):
     BROWSER = 1
     TERMINAL = 2
-def get_circuit(qc):
-    qc_qiskit = hume_to_qiskit(qc.regs, qc.transformations)
-    qc_str = str(qc_qiskit.draw())
-    print(qc_str)
-    return qc_str
+
+
 
 def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u2588'):
     assert (decimals <= 10)
@@ -68,10 +100,10 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
                               abs(round_state[k]) > 0 else offsets[4] * ' ').ljust(offsets[4], ' '),
 
                              f'<font style="color:rgb{complex_to_rgb(round_state[k], ints=True)}">' + (
-                                         int(abs(state[k] * 24)) * symbol).ljust(offsets[5],
-                                                                                 ' ') + '</font>' if display == display.BROWSER else
+                                     int(abs(state[k] * 24)) * symbol).ljust(offsets[5],
+                                                                             ' ') + '</font>' if display == display.BROWSER else
                              fg(*[int(255 * a) for a in complex_to_rgb(state[k])]) + (
-                                         int(abs(state[k] * 24)) * symbol).ljust(offsets[5], ' ') + fg.rs,
+                                     int(abs(state[k] * 24)) * symbol).ljust(offsets[5], ' ') + fg.rs,
 
                              str(round(abs(state[k]) ** 2, decimals)).ljust(decimals + 2, ' ')
                              ])
@@ -79,75 +111,33 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
 
     return output
 
-# template = pn.template.BootstrapTemplate(title='Building Quantum Software')
+def create_any_qubit(qubits):
+    return QuantumCircuit(QuantumRegister(qubits))
 
-# template.header.append('### Frequency Encoding')
 
-def encode_frequency(n, v):
-    q = QuantumRegister(n)
-    qc = QuantumCircuit(q)
+def apply_gate(qc, target, gate, angle=None, report=True):
+    gate = gate.lower()
+    if gate in arg_gates:
+        assert (angle is not None)
+    add_gate(qc, [], target, gate, angle / 180 * pi if gate in arg_gates else None)
+    if report:
+        qc.report(f'Step {len(qc.reports) + 1}')
 
-    for j in range(n):
-        qc.h(q[j])
-        qc.p(pi * 2 ** -j * v, q[j])
+def last_step(qc):
+    return len(qc.reports)
 
-    qc.report('signal')
+def get_state(qc):
+    if not qc.reports:
+        state = qc.state
+    else:
+        state = qc.reports[f'Step {len(qc.reports)}'][2]
 
-    qc.append_iqft(q, reversed=True, swap=False) #Apply the IQFT to qubit in reverse order and skip the qubit swapping in the IQFT
+    # print(state_table_to_string(state, display=Display.TERMINAL))
+    return f'{state_table_to_string(state)}'
 
-    qc.report('iqft')
 
-    return qc
+def reset(qc, qubits):
+    qc = QuantumCircuit(QuantumRegister(qubits))
 
-def get_frequency(n, v):
-    f = (f'Frequency:\n{v}' + (f' mapped to {round(v%2**n, 2)}' if v >= 2**n or v < 0 else ''))
-    return pn.pane.Str(f)
-
-def get_circuit_str(n, v):
-    qc = encode_frequency(n, v)
-    c = f'Circuit:\n{get_circuit(qc)}'
-    return pn.pane.Str(c)
-
-def get_state_str(n, v):
-    qc = encode_frequency(n, v)
-    state = qc.reports['iqft'][2]
-    s = f'State:\n{state_table_to_string(state)}'
-    return pn.pane.Str(s)
-
-get_frequency(3, 4.3)
-get_circuit_str(3, 4.3)
-get_state_str(3, 4.3)
-
-qubits = pn.widgets.IntInput(name="Qubits", value=3, start=1, end=5)
-frequency = pn.widgets.FloatInput(name="Frequency", value=4.3, start=0)
-select = pn.widgets.Select(name="select app", options=['choose', 'frequency', 'testprint'])
-
-circuit = pn.bind(
-    get_circuit_str, n=qubits, v=frequency
-)
-
-state = pn.bind(
-    get_state_str, n=qubits, v=frequency
-)
-
-mapped = pn.bind(
-    get_frequency, n=qubits, v=frequency
-)
-widgets = pn.Column(qubits, frequency, sizing_mode='fixed', width=100)
-
-display = pn.GridBox(
-    mapped,
-    circuit,
-    state,
-    ncols=1,
-    sizing_mode='fixed',
-    width = 800
-)
-
-pn.Column(widgets, display)
-
-pn.template.MaterialTemplate(
-    title="Frequency Encoding",
-    sidebar=[qubits, frequency],
-    main=[display],
-).servable();
+def last_step(qc):
+    return len(qc.reports)

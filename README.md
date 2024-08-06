@@ -47,7 +47,7 @@ python -m panel serve experiments/single_qubit.py --show
 
 ```bash
 cd src 
-python -m panel serve experiments/any_qubit.py --show
+python -m panel serve experiments/single_qubit.py --show
 ```
 
 ![Any Qubit App](./assets/images/any_qubit_app.png)

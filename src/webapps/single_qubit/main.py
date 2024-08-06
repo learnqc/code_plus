@@ -5,13 +5,9 @@ from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from hume.utils.common import complex_to_rgb
 
 import panel as pn
-import sympy as sp
-from sty import bg
-
-from tabulate import tabulate
-
 
 pn.extension(sizing_mode="stretch_width")
+
 
 def circuit_to_string(qc):
     qs = [{ 'id': i } for i in range(sum(qc.regs))]
@@ -23,9 +19,12 @@ def circuit_to_string(qc):
     circ = {'qubits': qs, 'operations': ops}
     return str(circ).replace('True', 'true').replace('False', 'false')
 
+
 class Display(Enum):
     BROWSER = 1
     TERMINAL = 2
+
+
 
 def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u2588'):
     assert (decimals <= 10)
@@ -73,91 +72,70 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
                               abs(round_state[k]) > 0 else offsets[4] * ' ').ljust(offsets[4], ' '),
 
                              f'<font style="color:rgb{complex_to_rgb(round_state[k], ints=True)}">' + (
-                                         int(abs(state[k] * 24)) * symbol).ljust(offsets[5],
-                                                                                 ' ') + '</font>' if display == display.BROWSER else
+                                     int(abs(state[k] * 24)) * symbol).ljust(offsets[5],
+                                                                             ' ') + '</font>' if display == display.BROWSER else
                              fg(*[int(255 * a) for a in complex_to_rgb(state[k])]) + (
-                                         int(abs(state[k] * 24)) * symbol).ljust(offsets[5], ' ') + fg.rs,
+                                     int(abs(state[k] * 24)) * symbol).ljust(offsets[5], ' ') + fg.rs,
 
                              str(round(abs(state[k]) ** 2, decimals)).ljust(decimals + 2, ' ')
                              ])
         output += '\n'
 
-
     return output
 
-def encode_term(coeff, vars, circuit, key, value):
-    if isinstance(coeff, int) is False:
-        coeff = coeff.value
-    for i in range(len(value)):
-        if len(vars) > 1:
-            # circuit.mcp(2*pi * 2 ** (i - N) * coeff, [key[j] for j in vars], value[i])
-            circuit.mcp(pi * 2 ** -i * coeff, [key[j] for j in vars], value[i])
-        elif len(vars) > 0:
-            # circuit.cp(2*pi * 2 ** (i - N) * coeff, key[vars[0]], value[i])
-            circuit.cp(pi * 2 ** -i * coeff, key[vars[0]], value[i])
+no_arg_gates = ['h', 'x', 'y', 'z']
+arg_gates = ['p', 'rx', 'ry', 'rz']
+gates = no_arg_gates + arg_gates
+
+
+def add_gate(qc, cs, target, gate, angle):
+    if len(cs) == 1:
+        gate = 'c' + gate
+    elif len(cs) > 1:
+        gate = 'mc' + gate
+
+    m = getattr(qc, gate)
+
+    if angle is None:
+        if len(cs) == 1:
+            m(cs[0], int(target))
+        elif len(cs) > 1:
+            m(cs, int(target))
         else:
-            # circuit.p(2*pi * 2 ** (i - N) * coeff, value[i])
-            circuit.p(pi * 2 ** -i * coeff, value[i])
-
-def build_polynomial_circuit(key_size, value_size, terms):
-    key = QuantumRegister(key_size)
-    value = QuantumRegister(value_size)
-    circuit = QuantumCircuit(key, value)
-
-    for i in range(len(key)):
-        circuit.h(key[i])
-
-    for i in range(len(value)):
-        circuit.h(value[i])
-
-    for (coeff, vars) in terms:
-        encode_term(coeff, vars, circuit, key, value)
-
-    circuit.iqft(value[::-1], swap=False)
-
-    circuit.report('qpe')
-    return circuit
-
-def grid_state(state, m=1, neg=False, show_probs=False):
-    n = int(log2(len(state))) - m
-    cols = 2**m
-    rows = int(len(state) / cols) # first register
-    print('\n')
-    if neg:
-        out = tabulate([[(str(k) if k < rows/2 else str(k - rows)) + ' = ' + bin(k)[2:].zfill(n)] + [
-            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
-            for l in range(cols)] for k in list(range(int(rows/2)))[::-1] + list(range(int(rows/2), rows))[::-1]],
-                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
-                       tablefmt='fancy_grid')
+            m(int(target))
     else:
-        out = tabulate([[str(k) + ' = ' + bin(k)[2:].zfill(n)] + [
-            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
-            for l in range(cols)] for k in range(rows)[::-1]],
-                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
-                       tablefmt='fancy_grid')
+        if len(cs) == 1:
+            m(angle, cs[0], int(target))
+        elif len(cs) > 1:
+            m(angle, cs, int(target))
+        else:
+            m(angle, int(target))
+def create_single_qubit():
+    return QuantumCircuit(QuantumRegister(1))
 
-    return out
-# polynomial stuff
-def terms_from_poly(poly_str, num_bits, is_poly):
-    for i in range(num_bits):
-        globals()[f'x{i}'] = sp.Symbol(f'x{i}')
 
-    if is_poly:
-        temp = [f'{2 ** i}*x{i}' for i in range(num_bits)]
-        bin_var_str = '+'.join(temp[::-1])
-        bin_var = sp.sympify(bin_var_str)
+def apply_gate(qc, gate, angle=None, report=True):
+    gate = gate.lower()
+    if gate in arg_gates:
+        assert (angle is not None)
+    add_gate(qc, [], 0, gate, angle / 180 * pi if gate in arg_gates else None)
+    if report:
+        qc.report(f'Step {len(qc.reports) + 1}')
 
-        new_poly = poly_str.replace('x', f"({str(bin_var)})")
+def last_step(qc):
+    return len(qc.reports)
+
+def get_state(qc):
+    if not qc.reports:
+        state = qc.state
     else:
-        new_poly = poly_str
-    s = sp.poly(new_poly)
+        state = qc.reports[f'Step {len(qc.reports)}'][2]
 
-    terms = s.terms()
+    # print(state_table_to_string(state, display=Display.TERMINAL))
+    return f'{state_table_to_string(state)}'
 
-    poly = []
-    for term in terms:
-        temp = (int(term[1]), [int(i) for i in range(len(term[0])) if term[0][i] > 0])
-        poly.append(temp)
+def reset(qc):
+    qc = QuantumCircuit(QuantumRegister(1))
 
-    return poly
-
+def last_step(qc):
+    return len(qc.reports)

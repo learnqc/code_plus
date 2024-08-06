@@ -69,18 +69,21 @@
             <a href="/">
                 <img src="https://avatars.githubusercontent.com/u/163343503?v=4" width="80" class="logo" />
             </a>
-            <a class="title" href="" style="color: #f0ab3c">Learn Quantum Computing: Quantum Phase Estimation</a>
+            <a class="title" href="" style="color: #f0ab3c">Learn Quantum Computing</a>
         </div>
     </nav>
 
     <section class="pyscript">
-        <div class="row overflow-hidden" id="content">
+        <div class="row" id="content">
             <div class="sidenav" id="sidebar">
                 <ul class="nav flex-column">
+                    <div class="bk-root" id="app-select-widget"></div>
+                    <div class="bk-root" id="app-switch-widget"></div>
                     <div class="bk-root" id="num-key-widget"></div>
                     <div class="bk-root" id="num-value-widget"></div>
                     <div class="bk-root" id="poly-widget"></div>
-                    <div class="bk-root" id="select-widget"></div>
+                    <div class="bk-root" id="input-select-widget"></div>
+                    <div class="bk-root" id="negative-select-widget"></div>
                     <div class="bk-root" id="go-widget"></div>
 
                 </ul>
@@ -108,13 +111,39 @@
 
             document.getElementById('info_title').innerHTML = '<u></u>'
         }
-        
+
+
         function clearInfo() {
             const infoDiv = document.getElementById('info');
             if (infoDiv != null) {
-            infoDiv.innerHTML = '';
+                infoDiv.innerHTML = '';
             }
-    }
+
+        }
+
+        function clearInputs() {
+            const ids = [
+                'num-key-widget',
+                'num-value-widget',
+                'poly-widget',
+                'input-select-widget',
+                'go-widget'
+            ];
+
+            ids.forEach(id => {
+                const element = document.getElementById(id);
+                if (element != null) {
+                    element.innerHTML = '';
+                }
+            });
+        }
+        function clearCirc() {
+            const infoDiv = document.getElementById('circuit');
+            if (infoDiv != null) {
+                infoDiv.innerHTML = '';
+            }
+
+        }
 
     </script>
 
@@ -123,28 +152,32 @@
         from tabulate import tabulate
         from sty import bg
 
-        select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms']).servable(target='select-widget')
         n_key = pn.widgets.IntInput(name="# of Qubits", value=2).servable(target='num-key-widget')
         n_value = pn.widgets.IntInput(name="# of Bits", value=2).servable(target='num-value-widget')
+        input_select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms']).servable(target='input-select-widget')
         poly = pn.widgets.TextInput(name="Polynomial", value='x**2').servable(target='poly-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
+        negative = pn.widgets.Select(name="Negative values for grid state?", options=['Select', 'Yes', 'No']).servable(target='negative-select-widget')
 
         @pn.depends(go, watch=True)
-        def run(v):
-            
+        def function_encoding(v):
+
             js.clearInfo()
-            coeffs = terms_from_poly(poly.value, n_key.value, select.value == 'Polynomial')
+            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Polynomial')
             qc = build_polynomial_circuit(n_key.value, n_value.value, coeffs)
 
             c = circuit_to_string(qc)
 
             state = qc.reports['qpe'][2]
-            s = f'State:\n{grid_state(state, n_key.value, False, True)}'
+            # grid_state = grid_state_html(state, n_key.value, negative.value == 'Yes', True)
+            grid_state = grid_state_html(state, n_key.value, negative.value == 'Yes', True)
+            s = f'State:\n{grid_state}'
             # s = f'State:\n{state_table_to_string(state)}'
             js.draw(c)
-            
-            out = pn.pane.Str(f'{s}\n').servable(target='info')
-            return out        
+
+            out = pn.pane.HTML(f'{s}\n').servable(target='info')
+            return out
+
     </py-script>
 </body>
 </html>
