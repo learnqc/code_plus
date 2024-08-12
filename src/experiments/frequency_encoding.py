@@ -50,7 +50,11 @@ state = pn.bind(
 mapped = pn.bind(
     get_frequency, n=qubits, v=frequency
 )
-widgets = pn.Column(qubits, frequency, sizing_mode='fixed', width=100)
+
+widgets = pn.Column(qubitsو )
+widgets.append(frequency)
+print(widgets)
+widgets.pop(1)
 
 display = pn.GridBox(
     mapped,
@@ -65,6 +69,6 @@ pn.Column(widgets, display)
 
 pn.template.MaterialTemplate(
     title="Frequency Encoding",
-    sidebar=[qubits, frequency],
+    sidebar=[widgets],
     main=[display],
 ).servable()

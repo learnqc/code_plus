@@ -3,6 +3,7 @@ from math import log2, floor, log10, atan2, pi
 
 from hume.qiskit.util import hume_to_qiskit
 from hume.utils.common import complex_to_rgb
+from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from sty import fg
 
 no_arg_gates = ['h', 'x', 'y', 'z']
