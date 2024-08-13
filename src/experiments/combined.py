@@ -155,32 +155,32 @@ def run(v):
         info.object = out
 
     if app_select.value == 'Function encoding':
-        n_key = pn.widgets.IntInput(name="# of Qubits", value=2)
-        n_value = pn.widgets.IntInput(name="# of Bits", value=2)
-        input_select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms'], value='Polynomial')
-        poly = pn.widgets.TextInput(name="Expression", value = 'x**2')
+        n_key = pn.widgets.IntInput(name="# Input Qubits", value=2)
+        n_value = pn.widgets.IntInput(name="# Output Qubits", value=2)
+        input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable')
+        poly = pn.widgets.TextInput(name="Function", value = 'x**2')
         go = pn.widgets.Button(name='Apply', button_type='primary')
-        negative = pn.widgets.Select(name="Negative values for grid state?", options=['Select', 'Yes', 'No'])
+        negative = pn.widgets.Select(name="Negative values for output?", options=['Select', 'Yes', 'No'])
 
         widgets.extend([n_key, n_value, input_select, poly, negative, go])
 
         @pn.depends(input_select, watch=True)
         def change_expression(v):
-            if input_select.value == 'Binary Terms':
+            if input_select.value == 'Binary variable':
                 widgets.pop(4)
-                poly = pn.widgets.TextInput(name="Expression", value='x0')
+                poly = pn.widgets.TextInput(name="Function", value='x0')
                 widgets.insert(4, poly)
 
             else:
                 widgets.pop(4)
-                poly = pn.widgets.TextInput(name="Expression", value='x**2')
+                poly = pn.widgets.TextInput(name="Function", value='x**2')
                 widgets.insert(4, poly)
         @pn.depends(go, watch=True)
         def function_encoding(v):
             while(len(display) > 0):
                 display.pop(0)
 
-            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Polynomial')
+            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
             qc = build_polynomial_circuit(n_key.value, n_value.value, coeffs)
 
             c = f'Circuit:\n{get_circuit(qc)}'
