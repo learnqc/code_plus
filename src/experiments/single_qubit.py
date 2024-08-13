@@ -12,9 +12,7 @@ from components.common import arg_gates, gates, state_table_to_string
 import panel as pn
 
 # # Explicitly set template and add some text to the header area
-template = pn.template.BootstrapTemplate(title='Building Quantum Software')
-
-template.header.append('### Single-Qubit Circuit')
+template = pn.template.BootstrapTemplate(title='Single Qubit Circuit')
 
 gate = pn.widgets.Select(name='Gate', options=[None] + [gate.upper() for gate in gates])
 arg = pn.widgets.NumberInput(name='Angle (in degrees)', disabled=True)

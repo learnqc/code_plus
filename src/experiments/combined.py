@@ -10,26 +10,21 @@ from components.common import *
 from components.frequency_encoding_component import *
 from components.function_encoding_component import *
 from components.combined_component import *
-
-from enum import Enum
-
-
-from hume.simulator.circuit import QuantumCircuit, QuantumRegister
-from hume.qiskit.util import hume_to_qiskit
-from hume.utils.common import complex_to_rgb
-from math import log2, floor, log10, atan2, pi
 import panel as pn
-
-from sty import bg
-
-pn.extension(template='material')
 
 app_select = pn.widgets.Select(name="App", options=['Select', 'Any qubit', 'Single qubit', 'Function encoding',
                                                     'Frequency encoding'])
 
-widgets = pn.Column(app_select).servable(target='sidebar')
+widgets = pn.Column(app_select)
 
-display = pn.Column().servable(target='main')
+display = pn.Column()
+
+pn.template.MaterialTemplate(
+    title="Building Quantum Software",
+    sidebar=[widgets],
+    main=[display],
+).servable()
+
 
 
 @pn.depends(app_select, watch=True, on_init=True)
@@ -162,13 +157,24 @@ def run(v):
     if app_select.value == 'Function encoding':
         n_key = pn.widgets.IntInput(name="# of Qubits", value=2)
         n_value = pn.widgets.IntInput(name="# of Bits", value=2)
-        input_select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms'])
-        poly = pn.widgets.TextInput(name="Polynomial", value='x**2')
+        input_select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms'], value='Polynomial')
+        poly = pn.widgets.TextInput(name="Expression", value = 'x**2')
         go = pn.widgets.Button(name='Apply', button_type='primary')
         negative = pn.widgets.Select(name="Negative values for grid state?", options=['Select', 'Yes', 'No'])
 
         widgets.extend([n_key, n_value, input_select, poly, negative, go])
 
+        @pn.depends(input_select, watch=True)
+        def change_expression(v):
+            if input_select.value == 'Binary Terms':
+                widgets.pop(4)
+                poly = pn.widgets.TextInput(name="Expression", value='x0')
+                widgets.insert(4, poly)
+
+            else:
+                widgets.pop(4)
+                poly = pn.widgets.TextInput(name="Expression", value='x**2')
+                widgets.insert(4, poly)
         @pn.depends(go, watch=True)
         def function_encoding(v):
             while(len(display) > 0):

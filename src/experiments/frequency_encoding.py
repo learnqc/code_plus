@@ -51,7 +51,7 @@ mapped = pn.bind(
     get_frequency, n=qubits, v=frequency
 )
 
-widgets = pn.Column(qubitsو )
+widgets = pn.Column(qubits)
 widgets.append(frequency)
 print(widgets)
 widgets.pop(1)
