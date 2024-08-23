@@ -67,7 +67,7 @@ def state_table_to_string(state, display=Display.BROWSER, decimals=4, symbol='\u
                                                                                                      '0')) + '\u00b0' if
                               abs(round_state[k]) > 0 else offsets[4] * ' ').ljust(offsets[4], ' '),
 
-                             f'<font style="color:rgb{complex_to_rgb(round_state[k], ints=True)}">' + (
+                             f'<font style="color:rgb{tuple(complex_to_rgb(round_state[k], ints=True))}">' + (
                                          int(abs(state[k] * 24)) * symbol).ljust(offsets[5],
                                                                                  ' ') + '</font>' if display == display.BROWSER else
                              fg(*[int(255 * a) for a in complex_to_rgb(state[k])]) + (
@@ -94,23 +94,3 @@ def encode_frequency(n, v):
     qc.report('iqft')
 
     return qc
-
-def grid_state(state, m=1, neg=False, show_probs=False):
-    n = int(log2(len(state))) - m
-    cols = 2**m
-    rows = int(len(state) / cols) # first register
-    print('\n')
-    if neg:
-        out = tabulate([[(str(k) if k < rows/2 else str(k - rows)) + ' = ' + bin(k)[2:].zfill(n)] + [
-            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
-            for l in range(cols)] for k in list(range(int(rows/2)))[::-1] + list(range(int(rows/2), rows))[::-1]],
-                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
-                       tablefmt='fancy_grid')
-    else:
-        out = tabulate([[str(k) + ' = ' + bin(k)[2:].zfill(n)] + [
-            (' ' + (str(round(abs(state[k*cols + l])**2, 2)) if abs(state[k*cols + l]) > 0.01 else ''))
-            for l in range(cols)] for k in range(rows)[::-1]],
-                       headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
-                       tablefmt='fancy_grid')
-
-    return out

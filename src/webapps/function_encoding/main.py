@@ -54,7 +54,7 @@ def grid_state_html(state, m=1, neg=False, show_probs=False, symbol='\u2588'):
 
         for l in range(cols):
             index = k * cols + l
-            color = complex_to_rgb(state[index], True)
+            color = tuple(complex_to_rgb(state[index], True))
             magnitude = int(abs(state[index] * 10))
             probability = round(abs(state[index]) ** 2, 2) if show_probs and abs(state[index]) > 0.01 else ''
             # Construct cell with embedded style
