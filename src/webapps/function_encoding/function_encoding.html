@@ -89,11 +89,10 @@
                 </ul>
             </div>
             <div class="col mh-100 float-right" id="main">
-                <div class="bk-root" id="circuit_title"></div>
-                <div class="bk-root" id="circuit"></div>
                 <div class="bk-root" id="info_title"></div>
                 <div class="bk-root" id="info"></div>
-                <div class="bk-root" id="test"></div>
+                <div class="bk-root" id="circuit_title"></div>
+                <div class="bk-root" id="circuit"></div>
             </div>
         </div>
 
@@ -145,6 +144,14 @@
 
         }
 
+        function clearPoly() {
+            const infoDiv = document.getElementById('poly-widget');
+            if (infoDiv != null) {
+                infoDiv.innerHTML = '';
+            }
+        }
+
+
     </script>
 
     <py-script>
@@ -152,18 +159,28 @@
         from tabulate import tabulate
         from sty import bg
 
-        n_key = pn.widgets.IntInput(name="# of Qubits", value=2).servable(target='num-key-widget')
-        n_value = pn.widgets.IntInput(name="# of Bits", value=2).servable(target='num-value-widget')
-        input_select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms']).servable(target='input-select-widget')
-        poly = pn.widgets.TextInput(name="Polynomial", value='x**2').servable(target='poly-widget')
+        n_key = pn.widgets.IntInput(name="# Input Qubits", value=2).servable(target='num-key-widget')
+        n_value = pn.widgets.IntInput(name="# Output Qubits", value=4).servable(target='num-value-widget')
+        input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable').servable(target='input-select-widget')
+        poly = pn.widgets.TextInput(name="Function", value='x**2').servable(target='poly-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
-        negative = pn.widgets.Select(name="Negative values for grid state?", options=['Select', 'Yes', 'No']).servable(target='negative-select-widget')
+        negative = pn.widgets.Select(name="Negative values for output?", options=['Select', 'Yes', 'No']).servable(target='negative-select-widget')
+
+
+        @pn.depends(input_select, watch=True)
+        def change_expression(v):
+            js.clearPoly()
+            if input_select.value == 'Binary variable':
+                poly = pn.widgets.TextInput(name="Function", value='x0').servable(target='poly-widget')
+
+            else:
+                poly = pn.widgets.TextInput(name="Function", value='x**2').servable(target='poly-widget')
 
         @pn.depends(go, watch=True)
         def function_encoding(v):
 
             js.clearInfo()
-            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Polynomial')
+            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
             qc = build_polynomial_circuit(n_key.value, n_value.value, coeffs)
 
             c = circuit_to_string(qc)

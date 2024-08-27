@@ -18,50 +18,58 @@ from math import log2, floor, log10, atan2, pi
 import panel as pn
 
 
-def get_circuit_str(k, v, p, i, n):
-    coeffs = terms_from_poly(p, k, i == 'Polynomial')
-    qc = build_polynomial_circuit(k, v, coeffs)
-    c = f'Circuit:\n{get_circuit(qc)}'
-    return pn.pane.Str(c)
+app_select = pn.widgets.Select(name="App", options=['Select', 'Any qubit', 'Single qubit', 'Function encoding',
+                                                    'Frequency encoding'])
 
-def get_grid(k, v, p, i, n):
-    coeffs = terms_from_poly(p, k, i == 'Polynomial')
-    qc = build_polynomial_circuit(k, v, coeffs)
-    state = qc.reports['qpe'][2]
-    grid = grid_state_html(state, k, n == 'Yes', True)
-    return pn.pane.HTML(grid)
+widgets = pn.Column(app_select)
 
-get_circuit_str(2, 2, 'x**2', 'Polynomial', 'No')
-get_grid(2, 2, 'x**2', 'Polynomial', 'No')
-
-n_key = pn.widgets.IntInput(name="# of Qubits", value=2)
-n_value = pn.widgets.IntInput(name="# of Bits", value=2)
-poly = pn.widgets.TextInput(name="Polynomial", value='x**2')
-input_select = pn.widgets.Select(name="Type of expression", options=['Polynomial', 'Binary Terms'], value='Polynomial')
-negative = pn.widgets.Select(name="Negative values for grid state?", options=['Yes', 'No'], value='No')
-
-circuit = pn.bind(
-    get_circuit_str, k=n_key, v=n_value, p=poly, i=input_select, n=negative
-)
-
-grid = pn.bind(
-    get_grid, k=n_key, v=n_value, p=poly, i=input_select, n=negative
-)
-
-widgets = pn.Column(n_key, n_value, poly, input_select, negative, sizing_mode='fixed', width=100)
-
-display = pn.GridBox(
-    circuit,
-    grid,
-    ncols=1,
-    sizing_mode='fixed',
-    width = 800
-)
-
-pn.Column(widgets, display)
+display = pn.Column()
 
 pn.template.MaterialTemplate(
-    title="Function Encoding",
-    sidebar=[n_key, n_value, poly, input_select, negative],
+    title="Building Quantum Software",
+    sidebar=[widgets],
     main=[display],
 ).servable()
+
+n_key = pn.widgets.IntInput(name="# Input Qubits", value=2)
+n_value = pn.widgets.IntInput(name="# Output Qubits", value=4)
+input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable')
+poly = pn.widgets.TextInput(name="Function", value = 'x**2')
+go = pn.widgets.Button(name='Apply', button_type='primary')
+negative = pn.widgets.Select(name="Negative values for output?", options=['Select', 'Yes', 'No'])
+
+widgets.extend([n_key, n_value, poly, input_select, negative, go])
+
+@pn.depends(input_select, watch=True)
+def change_expression(v):
+    if input_select.value == 'Binary variable':
+        widgets.pop(3)
+        poly = pn.widgets.TextInput(name="Function", value='x0')
+        widgets.insert(3, poly)
+
+    else:
+        widgets.pop(3)
+        poly = pn.widgets.TextInput(name="Function", value='x**2')
+        widgets.insert(3, poly)
+@pn.depends(go, watch=True)
+def function_encoding(v):
+    while(len(display) > 0):
+        display.pop(0)
+
+    coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
+    qc = build_polynomial_circuit(n_key.value, n_value.value, coeffs)
+
+    c = f'Circuit:\n{get_circuit(qc)}'
+
+    state = qc.reports['qpe'][2]
+    # grid_state = grid_state_html(state, n_key.value, negative.value == 'Yes', True)
+    grid_state = grid_state_html(state, n_key.value, negative.value == 'Yes', True)
+    s = f'State:\n{grid_state}'
+    # s = f'State:\n{state_table_to_string(state)}'
+
+    grid = pn.pane.HTML(f'{s}')
+    out = pn.pane.Str(f'{c}\n\n')
+    display.append(grid)
+    display.append(out)
+
+    return out

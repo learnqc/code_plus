@@ -53,13 +53,11 @@ mapped = pn.bind(
 
 widgets = pn.Column(qubits)
 widgets.append(frequency)
-print(widgets)
-widgets.pop(1)
 
 display = pn.GridBox(
     mapped,
-    circuit,
     state,
+    circuit,
     ncols=1,
     sizing_mode='fixed',
     width = 800

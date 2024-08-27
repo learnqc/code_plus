@@ -8,8 +8,6 @@ import panel as pn
 import sympy as sp
 from sty import bg
 
-from tabulate import tabulate
-
 
 pn.extension(sizing_mode="stretch_width")
 
@@ -57,7 +55,7 @@ def grid_state_html(state, m=1, neg=False, show_probs=False, symbol='\u2588'):
             color = tuple(complex_to_rgb(state[index], True))
             magnitude = int(abs(state[index] * 10))
             probability = round(abs(state[index]) ** 2, 2) if show_probs and abs(state[index]) > 0.01 else ''
-            # Construct cell with embedded style
+            # construct cell with embedded style
             row += f'<td><font style="color:rgb{color}">{symbol * magnitude}</font>&nbsp;{probability}</td>'
 
         html_table += row + '</tr>'
