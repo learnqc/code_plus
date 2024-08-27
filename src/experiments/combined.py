@@ -223,7 +223,7 @@ def run(v):
             v = frequency.value
             f = (f'Frequency:\n{v}' + (f' mapped to {round(v % 2 ** n, 2)}' if v >= 2 ** n or v < 0 else ''))
 
-            out = pn.pane.Str(f'{s}\n\n{c}\n\n{f}')
+            out = pn.pane.Str(f'{s}\n\n{f}\n\n{c}')
             display.append(out)
             return out
 

@@ -17,16 +17,12 @@ from hume.utils.common import complex_to_rgb
 from math import log2, floor, log10, atan2, pi
 import panel as pn
 
-
-app_select = pn.widgets.Select(name="App", options=['Select', 'Any qubit', 'Single qubit', 'Function encoding',
-                                                    'Frequency encoding'])
-
-widgets = pn.Column(app_select)
+widgets = pn.Column()
 
 display = pn.Column()
 
 pn.template.MaterialTemplate(
-    title="Building Quantum Software",
+    title="Function Encoding",
     sidebar=[widgets],
     main=[display],
 ).servable()
@@ -43,14 +39,14 @@ widgets.extend([n_key, n_value, poly, input_select, negative, go])
 @pn.depends(input_select, watch=True)
 def change_expression(v):
     if input_select.value == 'Binary variable':
-        widgets.pop(3)
+        widgets.pop(2)
         poly = pn.widgets.TextInput(name="Function", value='x0')
-        widgets.insert(3, poly)
+        widgets.insert(2, poly)
 
     else:
-        widgets.pop(3)
+        widgets.pop(2)
         poly = pn.widgets.TextInput(name="Function", value='x**2')
-        widgets.insert(3, poly)
+        widgets.insert(2, poly)
 @pn.depends(go, watch=True)
 def function_encoding(v):
     while(len(display) > 0):
