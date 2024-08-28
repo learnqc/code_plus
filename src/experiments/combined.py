@@ -178,15 +178,17 @@ def run(v):
                 display.pop(0)
 
             coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
+            if type(coeffs) is str:
+                display.append(pn.pane.Str(f'{coeffs}'))
+                return
+            
             qc = build_polynomial_circuit(n_key.value, n_value.value, coeffs)
 
             c = f'Circuit:\n{get_circuit(qc)}'
 
             state = qc.reports['qpe'][2]
-            # grid_state = grid_state_html(state, n_key.value, negative.value == 'Yes', True)
             grid_state = grid_state_html(state, n_key.value, negative.value == 'Yes', True)
             s = f'State:\n{grid_state}'
-            # s = f'State:\n{state_table_to_string(state)}'
 
             grid = pn.pane.HTML(f'{s}')
             out = pn.pane.Str(f'{c}\n\n')

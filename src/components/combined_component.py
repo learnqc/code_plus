@@ -156,19 +156,36 @@ def build_polynomial_circuit(key_size, value_size, terms):
     return circuit
 
 def terms_from_poly(poly_str, num_bits, is_poly):
+    var_list = []
+
     for i in range(num_bits):
         globals()[f'x{i}'] = sp.Symbol(f'x{i}')
 
     if is_poly:
-        temp = [f'{2 ** i}*x{i}' for i in range(num_bits)]
-        bin_var_str = '+'.join(temp[::-1])
-        bin_var = sp.sympify(bin_var_str)
+        try:
+            temp = [f'{2 ** i}*x{i}' for i in range(num_bits)]
+            bin_var_str = '+'.join(temp[::-1])
+            bin_var = sp.sympify(bin_var_str)
 
-        new_poly = poly_str.replace('x', f"({str(bin_var)})")
+            new_poly = poly_str.replace('x', f"({str(bin_var)})")
+
+            s = sp.poly(new_poly)
+        except:
+            return "Error: Polynomial should be in form of a*x**n + b*x**(n-1) + ... + z*x + c"
     else:
         new_poly = poly_str
-    s = sp.poly(new_poly)
 
+        s = sp.poly(new_poly)
+
+
+        for symbol in s.free_symbols:
+            if str(symbol) not in globals():
+                return "Error: Invalid symbol"
+            
+        for term in s.terms():
+            if sum(term[0]) < 1:
+                return "Error: No constants"
+    
     terms = s.terms()
 
     poly = []
