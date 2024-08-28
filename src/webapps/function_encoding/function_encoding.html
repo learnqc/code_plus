@@ -164,17 +164,16 @@
         input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable').servable(target='input-select-widget')
         poly = pn.widgets.TextInput(name="Function", value='x**2').servable(target='poly-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
-        negative = pn.widgets.Select(name="Negative values for output?", options=['Select', 'Yes', 'No']).servable(target='negative-select-widget')
+        negative = pn.widgets.Select(name="Negative values for output?", options=['Yes', 'No'], value = 'No').servable(target='negative-select-widget')
 
 
         @pn.depends(input_select, watch=True)
         def change_expression(v):
-            js.clearPoly()
             if input_select.value == 'Binary variable':
-                poly = pn.widgets.TextInput(name="Function", value='x0').servable(target='poly-widget')
+                poly.value = 'x0'
 
             else:
-                poly = pn.widgets.TextInput(name="Function", value='x**2').servable(target='poly-widget')
+                poly.value = 'x**2'
 
         @pn.depends(go, watch=True)
         def function_encoding(v):

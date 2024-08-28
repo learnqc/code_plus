@@ -160,22 +160,19 @@ def run(v):
         input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable')
         poly = pn.widgets.TextInput(name="Function", value = 'x**2')
         go = pn.widgets.Button(name='Apply', button_type='primary')
-        negative = pn.widgets.Select(name="Negative values for output?", options=['Select', 'Yes', 'No'])
+        negative = pn.widgets.Select(name="Negative values for output?", options=['Yes', 'No'], value ='No')
 
         widgets.extend([n_key, n_value, poly, input_select, negative, go])
 
         @pn.depends(input_select, watch=True)
         def change_expression(v):
             if input_select.value == 'Binary variable':
-                widgets.pop(3)
-                poly = pn.widgets.TextInput(name="Function", value='x0')
-                widgets.insert(3, poly)
+                poly.value = 'x0'
 
             else:
-                widgets.pop(3)
-                poly = pn.widgets.TextInput(name="Function", value='x**2')
-                widgets.insert(3, poly)
+                poly.value = 'x**2'
         @pn.depends(go, watch=True)
+
         def function_encoding(v):
             while(len(display) > 0):
                 display.pop(0)

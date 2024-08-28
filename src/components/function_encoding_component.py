@@ -1,5 +1,5 @@
 from enum import Enum
-from math import pi, log2, log10, floor, atan2
+from math import pi, log2
 
 from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from hume.utils.common import complex_to_rgb
@@ -7,12 +7,6 @@ from hume.utils.common import complex_to_rgb
 import panel as pn
 import sympy as sp
 from sty import bg, fg
-
-pn.extension(sizing_mode="stretch_width")
-
-class Display(Enum):
-    BROWSER = 1
-    TERMINAL = 2
 
 def grid_state_html(state, m=1, neg=False, show_probs=False, symbol='\u2588'):
     n = int(log2(len(state))) - m
