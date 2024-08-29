@@ -176,9 +176,9 @@ def terms_from_poly(poly_str, num_bits, is_poly):
             if symbol not in var_list:
                 return "Error: Invalid symbol"
             
-        for term in s.terms():
-            if sum(term[0]) < 1:
-                return "Error: No constants"
+        # for term in s.terms():
+        #     if sum(term[0]) < 1:
+        #         return "Error: No constants"
     
     terms = s.terms()
     print(f'terms for {poly_str}: {terms}')
