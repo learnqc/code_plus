@@ -43,30 +43,24 @@ def build_polynomial_circuit(key_size, value_size, terms):
     return circuit
 
 def terms_from_poly(poly_str, num_bits, is_poly):
-    var_list = []
-
-    for i in range(num_bits):
-        globals()[f'x{i}'] = sp.Symbol(f'x{i}')
+    var_list = [sp.Symbol(f'x{i}') for i in range(num_bits)]
 
     if is_poly:
         try:
             temp = [f'{2 ** i}*x{i}' for i in range(num_bits)]
             bin_var_str = '+'.join(temp[::-1])
             bin_var = sp.sympify(bin_var_str)
-
             new_poly = poly_str.replace('x', f"({str(bin_var)})")
-
             s = sp.poly(new_poly)
         except:
             return "Error: Polynomial should be in form of a*x**n + b*x**(n-1) + ... + z*x + c"
     else:
         new_poly = poly_str
-
-        s = sp.poly(new_poly)
-
+        expr = sp.sympify(new_poly)
+        s = sp.poly(expr, var_list)
 
         for symbol in s.free_symbols:
-            if str(symbol) not in globals():
+            if symbol not in var_list:
                 return "Error: Invalid symbol"
             
         for term in s.terms():
@@ -74,18 +68,30 @@ def terms_from_poly(poly_str, num_bits, is_poly):
                 return "Error: No constants"
     
     terms = s.terms()
+    print(f'terms for {poly_str}: {terms}')
 
-    poly = []
-    for term in terms:
-        temp = (int(term[1]), [int(i) for i in range(len(term[0])) if term[0][i] > 0])
-        poly.append(temp)
+    poly = [(int(term[1]), [i for i, val in enumerate(term[0]) if val > 0]) for term in terms]
 
     return poly
 
-
-e1 = 'x0 + 1'
-p1 = terms_from_poly(e1, 2, False)
+inputs = 2
+outputs = 4
+e1 = 'x0*x1'
+p1 = terms_from_poly(e1, inputs, False)
 print(p1)
+
+e2 = 'x0'
+p2 = terms_from_poly(e2, inputs, False)
+print(p2)
+
+e3 = 'x1'
+p3 = terms_from_poly(e3, inputs, False)
+print(p3)
+
+
+c1 = build_polynomial_circuit(inputs, outputs, p1)
+c2 = build_polynomial_circuit(inputs, outputs, p2)
+c3 = build_polynomial_circuit(inputs, outputs, p3)
 
 
 # e2 = '1*x**2 + 2*x + 3'
@@ -117,4 +123,6 @@ def grid_state(state, m=1, neg=False, show_probs=False):
                        headers=[str(l) + ' = ' + bin(l)[2:].zfill(m) for l in range(cols)],
                        tablefmt='fancy_grid'))
         
-# print(grid_state(c1.reports['qpe'][2], 2, False, True))
+print(f'grid state for {e1}: {grid_state(c1.reports['qpe'][2], 2, False, True)}')
+print(f'grid state for {e2}: {grid_state(c2.reports['qpe'][2], 2, False, True)}')
+print(f'grid state for {e3}: {grid_state(c3.reports['qpe'][2], 2, False, True)}')
