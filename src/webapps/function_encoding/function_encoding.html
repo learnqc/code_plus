@@ -161,7 +161,7 @@
 
         n_key = pn.widgets.IntInput(name="# of input qubits", value=2).servable(target='num-key-widget')
         n_value = pn.widgets.IntInput(name="# of output qubits", value=4).servable(target='num-value-widget')
-        input_select = pn.widgets.Select(name="Type of input", options=['Integer variables', 'Binary variables'], value='Integer variables').servable(target='input-select-widget')
+        input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variables'], value='Integer variables').servable(target='input-select-widget')
         poly = pn.widgets.TextInput(name="Polynomial", value='x**2').servable(target='poly-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
         negative = pn.widgets.Select(name="Negative values for output?", options=['Select', 'Yes', 'No'], value = 'No').servable(target='negative-select-widget')
@@ -179,7 +179,7 @@
         def function_encoding(v):
 
             js.clearInfo()
-            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variables')
+            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
             if type(coeffs) == str:
                 out = pn.pane.HTML(f'{coeffs}').servable(target='info')
                 return out

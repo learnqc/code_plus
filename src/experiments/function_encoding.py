@@ -29,7 +29,7 @@ pn.template.MaterialTemplate(
 
 n_key = pn.widgets.IntInput(name="# of input qubits", value=2)
 n_value = pn.widgets.IntInput(name="# of output qubits", value=4)
-input_select = pn.widgets.Select(name="Type of input", options=['Integer variables', 'Binary variables'], value='Integer variables')
+input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variables'], value='Integer variables')
 poly = pn.widgets.TextInput(name="Polynomial", value = 'x**2')
 go = pn.widgets.Button(name='Apply', button_type='primary')
 negative = pn.widgets.Select(name="Negative values for output?", options=['Yes', 'No'],value='No')
@@ -49,7 +49,7 @@ def function_encoding(v):
     while(len(display) > 0):
         display.pop(0)
 
-    coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variables')
+    coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
     if type(coeffs) is str:
         display.append(pn.pane.Str(f'{coeffs}'))
         return

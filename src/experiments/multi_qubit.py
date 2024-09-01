@@ -14,7 +14,7 @@ import panel as pn
 # # Explicitly set template and add some text to the header area
 template = pn.template.BootstrapTemplate(title='Multi Qubit Circuit')
 
-qubits = pn.widgets.NumberInput(name='# of Qubits', start=1, end=5)
+qubits = pn.widgets.NumberInput(name='# of qubits', start=1, end=5, value=2)
 
 target = pn.widgets.NumberInput(name='Target', start=0, disabled=True)
 

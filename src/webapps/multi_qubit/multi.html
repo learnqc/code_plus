@@ -125,7 +125,7 @@
     <py-script>
         import js
 
-        qubits = pn.widgets.NumberInput(name='# of Qubits', start=1, end=5).servable(target='qubits-widget')
+        qubits = pn.widgets.NumberInput(name='# of qubits', start=1, end=5, value=2).servable(target='qubits-widget')
         target = pn.widgets.NumberInput(name='Target', start=0, disabled=True).servable(target='target-widget')
         gate = pn.widgets.Select(name='Gate', options=[None] + [gate.upper() for gate in gates]).servable(target='gate-widget')
         arg = pn.widgets.NumberInput(name='Angle (in degrees)', disabled=True).servable(target='arg-widget')
