@@ -12,7 +12,7 @@ from components.function_encoding_component import *
 from components.combined_component import *
 import panel as pn
 
-app_select = pn.widgets.Select(name="App", options=['Select', 'Any qubit', 'Single qubit', 'Function encoding',
+app_select = pn.widgets.Select(name="App", options=['Select', 'Multi qubit', 'Single qubit', 'Function encoding',
                                                     'Frequency encoding'])
 
 widgets = pn.Column(app_select)
@@ -37,7 +37,7 @@ def run(v):
     while (len(display) > 0):
         display.pop(0)
 
-    if app_select.value == 'Any qubit':
+    if app_select.value == 'Multi qubit':
         qubits = pn.widgets.NumberInput(name='# of Qubits', start=1, end=5)
         target = pn.widgets.NumberInput(name='Target', start=0, disabled=True)
         gate = pn.widgets.Select(name='Gate', options=[None] + [gate.upper() for gate in gates])
