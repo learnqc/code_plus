@@ -124,7 +124,7 @@
     <py-script>
         import js
 
-        qubits = pn.widgets.IntInput(name="Qubits", value=3, start=1, end=5).servable(target='qubit-widget')
+        qubits = pn.widgets.IntInput(name="# of Qubits", value=3, start=1, end=5).servable(target='qubit-widget')
         frequency = pn.widgets.FloatInput(name="Frequency", value=4.3, start=0).servable(target='freq-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
 

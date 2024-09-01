@@ -27,14 +27,14 @@ pn.template.MaterialTemplate(
     main=[display],
 ).servable()
 
-n_key = pn.widgets.IntInput(name="# Input Qubits", value=2)
-n_value = pn.widgets.IntInput(name="# Output Qubits", value=4)
+n_key = pn.widgets.IntInput(name="# of Input Qubits", value=2)
+n_value = pn.widgets.IntInput(name="# of Output Qubits", value=4)
 input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable')
-poly = pn.widgets.TextInput(name="Function", value = 'x**2')
+poly = pn.widgets.TextInput(name="Polynomial", value = 'x**2')
 go = pn.widgets.Button(name='Apply', button_type='primary')
 negative = pn.widgets.Select(name="Negative values for output?", options=['Yes', 'No'],value='No')
 
-widgets.extend([n_key, n_value, poly, input_select, negative, go])
+widgets.extend([n_key, n_value, input_select, poly, negative, go])
 
 @pn.depends(input_select, watch=True)
 def change_expression(v):

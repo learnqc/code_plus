@@ -69,7 +69,7 @@
             <a href="/">
                 <img src="https://avatars.githubusercontent.com/u/163343503?v=4" width="80" class="logo" />
             </a>
-            <a class="title" href="" style="color: #f0ab3c">Learn Quantum Computing: Any-Qubit Circuits</a>
+            <a class="title" href="" style="color: #f0ab3c">Learn Quantum Computing: Multi Qubit Circuit</a>
         </div>
     </nav>
 
@@ -125,7 +125,7 @@
     <py-script>
         import js
 
-        qubits = pn.widgets.NumberInput(name='Number of qubits', start=1, end=5).servable(target='qubits-widget')
+        qubits = pn.widgets.NumberInput(name='# of Qubits', start=1, end=5).servable(target='qubits-widget')
         target = pn.widgets.NumberInput(name='Target', start=0, disabled=True).servable(target='target-widget')
         gate = pn.widgets.Select(name='Gate', options=[None] + [gate.upper() for gate in gates]).servable(target='gate-widget')
         arg = pn.widgets.NumberInput(name='Angle (in degrees)', disabled=True).servable(target='arg-widget')

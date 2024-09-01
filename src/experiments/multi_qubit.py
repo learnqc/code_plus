@@ -6,15 +6,15 @@ import sys
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.resolve()))
 
-from components.any_qubit_component import AnyQubit
+from components.multi_qubit_component import AnyQubit
 from components.common import arg_gates, gates, get_circuit, state_table_to_string
 
 import panel as pn
 
 # # Explicitly set template and add some text to the header area
-template = pn.template.BootstrapTemplate(title='Any Qubit Circuit')
+template = pn.template.BootstrapTemplate(title='Multi Qubit Circuit')
 
-qubits = pn.widgets.NumberInput(name='Number of qubits', start=1, end=5)
+qubits = pn.widgets.NumberInput(name='# of Qubits', start=1, end=5)
 
 target = pn.widgets.NumberInput(name='Target', start=0, disabled=True)
 

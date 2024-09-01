@@ -81,8 +81,8 @@
                     <div class="bk-root" id="app-switch-widget"></div>
                     <div class="bk-root" id="num-key-widget"></div>
                     <div class="bk-root" id="num-value-widget"></div>
-                    <div class="bk-root" id="poly-widget"></div>
                     <div class="bk-root" id="input-select-widget"></div>
+                    <div class="bk-root" id="poly-widget"></div>
                     <div class="bk-root" id="negative-select-widget"></div>
                     <div class="bk-root" id="go-widget"></div>
 
@@ -159,10 +159,10 @@
         from tabulate import tabulate
         from sty import bg
 
-        n_key = pn.widgets.IntInput(name="# Input Qubits", value=2).servable(target='num-key-widget')
-        n_value = pn.widgets.IntInput(name="# Output Qubits", value=4).servable(target='num-value-widget')
+        n_key = pn.widgets.IntInput(name="# of Input Qubits", value=2).servable(target='num-key-widget')
+        n_value = pn.widgets.IntInput(name="# of Output Qubits", value=4).servable(target='num-value-widget')
         input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable').servable(target='input-select-widget')
-        poly = pn.widgets.TextInput(name="Function", value='x**2').servable(target='poly-widget')
+        poly = pn.widgets.TextInput(name="Polynomial", value='x**2').servable(target='poly-widget')
         go = pn.widgets.Button(name='Apply', button_type='primary').servable(target='go-widget')
         negative = pn.widgets.Select(name="Negative values for output?", options=['Yes', 'No'], value = 'No').servable(target='negative-select-widget')
 
