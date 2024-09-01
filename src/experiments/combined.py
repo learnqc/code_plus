@@ -12,7 +12,7 @@ from components.function_encoding_component import *
 from components.combined_component import *
 import panel as pn
 
-app_select = pn.widgets.Select(name="App", options=['Select', 'Multi qubit', 'Single qubit', 'Function encoding',
+app_select = pn.widgets.Select(name="App", options=['Select', 'Single qubit', 'Multi qubit',  'Function encoding',
                                                     'Frequency encoding'])
 
 widgets = pn.Column(app_select)
