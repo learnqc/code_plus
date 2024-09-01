@@ -181,7 +181,6 @@ def terms_from_poly(poly_str, num_bits, is_poly):
         #         return "Error: No constants"
     
     terms = s.terms()
-    print(f'terms for {poly_str}: {terms}')
 
     poly = [(int(term[1]), [i for i, val in enumerate(term[0]) if val > 0]) for term in terms]
 

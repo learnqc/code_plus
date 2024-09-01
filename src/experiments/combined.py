@@ -155,9 +155,9 @@ def run(v):
         info.object = out
 
     if app_select.value == 'Function encoding':
-        n_key = pn.widgets.IntInput(name="# of Input Qubits", value=2)
-        n_value = pn.widgets.IntInput(name="# of Output Qubits", value=4)
-        input_select = pn.widgets.Select(name="Type of input", options=['Integer variable', 'Binary variable'], value='Integer variable')
+        n_key = pn.widgets.IntInput(name="# of input qubits", value=2)
+        n_value = pn.widgets.IntInput(name="# of output qubits", value=4)
+        input_select = pn.widgets.Select(name="Type of input", options=['Integer variables', 'Binary variables'], value='Integer variables')
         poly = pn.widgets.TextInput(name="Polynomial", value = 'x**2')
         go = pn.widgets.Button(name='Apply', button_type='primary')
         negative = pn.widgets.Select(name="Negative values for output?", options=['Yes', 'No'],value='No')
@@ -166,18 +166,18 @@ def run(v):
 
         @pn.depends(input_select, watch=True)
         def change_expression(v):
-            if input_select.value == 'Binary variable':
+            if input_select.value == 'Binary variables':
                 poly.value = 'x0'
 
             else:
                 poly.value = 'x**2'
-        @pn.depends(go, watch=True)
 
+        @pn.depends(go, watch=True)
         def function_encoding(v):
             while(len(display) > 0):
                 display.pop(0)
 
-            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variable')
+            coeffs = terms_from_poly(poly.value, n_key.value, input_select.value == 'Integer variables')
             if type(coeffs) is str:
                 display.append(pn.pane.Str(f'{coeffs}'))
                 return
@@ -194,8 +194,6 @@ def run(v):
             out = pn.pane.Str(f'{c}\n\n')
             display.append(grid)
             display.append(out)
-
-            return out
 
 
 
