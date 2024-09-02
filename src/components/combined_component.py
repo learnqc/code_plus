@@ -174,7 +174,8 @@ def terms_from_poly(poly_str, num_bits, is_poly):
 
         for symbol in s.free_symbols:
             if symbol not in var_list:
-                return "Error: Invalid symbol"
+
+                return f"Error: {symbol} is invalid"
             
         # for term in s.terms():
         #     if sum(term[0]) < 1:

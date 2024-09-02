@@ -34,6 +34,16 @@ source bqs-env/bin/activate
 pip install -r requirements.txt
 ```
 
+## Run the interactive application
+
+```bash
+cd src 
+python -m panel serve experiments/combined.py --show
+```
+
+![Home Screen](./assets/images/combined_app_first.png)
+![Frequency Encoding App](./assets/images/combined_app_second.png)
+
 ## Run the single-qubit UI application
 
 ```bash
