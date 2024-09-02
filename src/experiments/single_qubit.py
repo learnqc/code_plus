@@ -7,12 +7,14 @@ import sys
 sys.path.append(str(pathlib.Path(__file__).parent.parent.resolve()))
 
 from components.single_qubit_component import SingleQubit
-from components.common import arg_gates, gates, state_table_to_string
+from components.common import *
 
 import panel as pn
 
 # # Explicitly set template and add some text to the header area
-template = pn.template.BootstrapTemplate(title='Single Qubit Circuit')
+template = pn.template.BootstrapTemplate(title='Building Quantum Software')
+
+template.header.append('### Single Qubit Circuit')
 
 gate = pn.widgets.Select(name='Gate', options=[None] + [gate.upper() for gate in gates])
 arg = pn.widgets.NumberInput(name='Angle (in degrees)', disabled=True)
@@ -40,7 +42,7 @@ def apply(v):
         s = component.get_state()
 
         # s = state_table_to_string(state)
-        qc_str = component.get_circuit()
+        qc_str = get_circuit(component.qc)
         out = f'Step {component.last_step()}\n-------\n\n{qc_str}\n\n{s}\n\n\n\n{out}'
     # else:
     #     s = component.get_state()

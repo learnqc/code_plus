@@ -1,5 +1,5 @@
 from hume.simulator.circuit import QuantumCircuit, QuantumRegister
-from math import log2, floor, log10, atan2, pi
+from math import pi
 
 def encode_frequency(n, v):
     q = QuantumRegister(n)

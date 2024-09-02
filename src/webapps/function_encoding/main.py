@@ -1,5 +1,5 @@
 from enum import Enum
-from math import pi, log2, log10, floor, atan2
+from math import pi, log2
 
 from hume.simulator.circuit import QuantumRegister, QuantumCircuit
 from hume.utils.common import complex_to_rgb

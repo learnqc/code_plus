@@ -34,6 +34,15 @@ source bqs-env/bin/activate
 pip install -r requirements.txt
 ```
 
+## Run the LearnQC UI application
+
+```bash
+cd src 
+python -m panel serve experiments/combined.py --show
+```
+
+![Any Qubit App](./assets/images/combined_ss.png)
+
 ## Run the single-qubit UI application
 
 ```bash
@@ -41,16 +50,34 @@ cd src
 python -m panel serve experiments/single_qubit.py --show
 ```
 
-![Single Qubit App](./assets/images/single_qubit_app.png)
+![Single Qubit App](./assets/images/singlequbit_ss.png)
 
-## Run the any-qubit UI application
+## Run the multi-qubit UI application
 
 ```bash
 cd src 
-python -m panel serve experiments/single_qubit.py --show
+python -m panel serve experiments/multi_qubit.py --show
 ```
 
-![Any Qubit App](./assets/images/any_qubit_app.png)
+![Any Qubit App](./assets/images/multiqubit_ss.png)
+
+## Run the function encoding UI application
+
+```bash
+cd src 
+python -m panel serve experiments/function_encoding.py --show
+```
+
+![Any Qubit App](./assets/images/functionencoding_ss.png)
+
+## Run the frequency encoding UI application
+
+```bash
+cd src 
+python -m panel serve experiments/frequency_encoding.py --show
+```
+
+![Any Qubit App](./assets/images/frequencyencoding_ss.png)
 
 ## AI Assistant
 

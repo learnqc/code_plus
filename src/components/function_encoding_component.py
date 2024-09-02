@@ -1,4 +1,3 @@
-from enum import Enum
 from math import pi, log2
 
 from hume.simulator.circuit import QuantumRegister, QuantumCircuit

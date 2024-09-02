@@ -5,7 +5,7 @@ from hume.simulator.circuit import QuantumCircuit, QuantumRegister
 from components.common import Display, arg_gates, add_gate, state_table_to_string
 
 
-class AnyQubit():
+class MultiQubit():
 
     def __init__(self, qubits, display=Display.BROWSER):
         self.display = display
