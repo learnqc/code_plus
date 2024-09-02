@@ -6,7 +6,7 @@ import sys
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.resolve()))
 
-from components.any_qubit_component import AnyQubit
+from components.multi_qubit_component import MultiQubit
 from components.common import arg_gates, gates, get_circuit, state_table_to_string
 
 import panel as pn
@@ -14,7 +14,7 @@ import panel as pn
 # # Explicitly set template and add some text to the header area
 template = pn.template.BootstrapTemplate(title='Building Quantum Software')
 
-template.header.append('### Quantum Circuit')
+template.header.append('### Multi Qubit Circuit')
 
 qubits = pn.widgets.NumberInput(name='Number of qubits', start=1, end=5)
 
@@ -31,7 +31,7 @@ component = None
 
 def select_qubits(v):
     global component
-    component = AnyQubit(qubits.value)
+    component = MultiQubit(qubits.value)
 
     target.end = qubits.value - 1
     target.disabled = qubits.value is None or qubits.value < 1

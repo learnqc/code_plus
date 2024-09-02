@@ -10,3 +10,4 @@ git+https://github.com/learnqc/code.git
 panel
 openai
 python-dotenv
+sympy
