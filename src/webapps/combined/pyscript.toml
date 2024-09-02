@@ -1,0 +1,10 @@
+packages = ["sty", "matplotlib", "colorcet", "sympy", "tabulate", "bokeh==3.2.2", "panel==1.3.8"]
+
+[files]
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/simulator/gates.py" = "./hume/simulator/gates.py"
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/simulator/core.py" = "./hume/simulator/core.py"
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/simulator/circuit.py" = "./hume/simulator/circuit.py"
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/qiskit/util.py" = "./hume/qiskit/util.py"
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/utils/common.py" = "./hume/utils/common.py"
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/utils/scalar_map.py" = "./hume/utils/scalar_map.py"
+"https://raw.githubusercontent.com/learnqc/code/main/src/hume/utils/matrix.py" = "./hume/utils/matrix.py"
