@@ -10,3 +10,9 @@ git+https://github.com/learnqc/code.git
 panel
 openai
 python-dotenv
+
+langchain_ollama
+openai-whisper
+sounddevice
+textwrap
+
